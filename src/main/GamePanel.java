@@ -1,7 +1,7 @@
 package main;
 
 import entity.Player;
-import harvestable.SuperHarvestable;
+import object.SuperObject;
 import stew.SuperStew;
 import tile.TileManager;
 
@@ -34,12 +34,12 @@ public class GamePanel extends JPanel implements Runnable {
     // Initialise Shit
     TileManager tileM = new TileManager(this);
     KeyHandler keyH = new KeyHandler();
-    public UI ui = new UI(this);
+    public UI ui = new UI(this, keyH);
     Thread gameThread;
     public CollisionDetector collisionDet = new CollisionDetector(this);
     public AssetSetter aSetter = new AssetSetter(this);
     public Player player;
-    public SuperHarvestable[] obj = new SuperHarvestable[10];
+    public SuperObject[] obj = new SuperObject[10];
     public SuperStew[] stewPots = new SuperStew[1];
 
     {
@@ -129,9 +129,9 @@ public class GamePanel extends JPanel implements Runnable {
 
         tileM.draw(g2);
 
-        for (SuperHarvestable superHarvestable : obj) {
-            if (superHarvestable != null) {
-                superHarvestable.draw(g2, this);
+        for (SuperObject superObject : obj) {
+            if (superObject != null) {
+                superObject.draw(g2, this);
             }
         }
 

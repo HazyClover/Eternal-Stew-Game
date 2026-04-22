@@ -1,4 +1,4 @@
-package harvestable;
+package object;
 
 import buff.SuperBuff;
 import main.GamePanel;
@@ -7,7 +7,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class SuperHarvestable {
+public class SuperObject {
 
     public BufferedImage image;
     public String name;

@@ -1,7 +1,7 @@
 package main;
 
-import harvestable.OBJ_berry_bush_blackberry;
-import harvestable.OBJ_berry_bush_blueberry;
+import object.OBJ_berry_bush_blackberry;
+import object.OBJ_berry_bush_blueberry;
 import stew.OBJ_Stew;
 
 public class AssetSetter {
