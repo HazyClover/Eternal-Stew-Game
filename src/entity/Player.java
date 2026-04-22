@@ -25,6 +25,11 @@ public class Player extends Entity{
     public HashMap<String, Integer> inventoryItemsRow4 = new HashMap<>();
     public HashMap<String, Integer> inventoryItemsRow5 = new HashMap<>();
 
+    public HashMap<String, Integer> inventoryHands = new HashMap<>();
+
+    public boolean isHand1 = true;
+    public boolean isHand2 = false;
+
     public long secondsToSleep = 0;
     public boolean isSleeping = false;
 
@@ -124,6 +129,21 @@ public class Player extends Entity{
                 getThreadSleep(moveSpeed);
             } else {
                 getThreadSleep(0);
+            }
+            if(keyH.isOnePressed) {
+                if(isHand2) {
+                    isHand2 = false;
+                    isHand1 = true;
+                } else {
+                    isHand1 = true;
+                }
+            } else if (keyH.isTwoPressed) {
+                if (isHand1) {
+                    isHand1 = false;
+                    isHand2 = true;
+                } else {
+                    isHand2 = true;
+                }
             }
         }
 
