@@ -2,7 +2,7 @@ package main;
 
 import object.OBJ_berry_bush_blackberry;
 import object.OBJ_berry_bush_blueberry;
-import stew.OBJ_Stew;
+import object.OBJ_Stew;
 
 public class AssetSetter {
     GamePanel gp;
@@ -21,8 +21,8 @@ public class AssetSetter {
         gp.obj[1].worldX = 15 * gp.tileSize;
         gp.obj[1].worldY = 10 * gp.tileSize;
 
-        gp.stewPots[0] = new OBJ_Stew(gp);
-        gp.stewPots[0].worldX = 14 * gp.tileSize;
-        gp.stewPots[0].worldY = 15 * gp.tileSize;
+        gp.obj[2] = new OBJ_Stew(gp);
+        gp.obj[2].worldX = 14 * gp.tileSize;
+        gp.obj[2].worldY = 15 * gp.tileSize;
     }
 }
