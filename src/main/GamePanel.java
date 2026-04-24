@@ -2,7 +2,6 @@ package main;
 
 import entity.Player;
 import object.SuperObject;
-import stew.SuperStew;
 import tile.TileManager;
 
 import javax.swing.JPanel;
@@ -40,7 +39,6 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter = new AssetSetter(this);
     public Player player;
     public SuperObject[] obj = new SuperObject[10];
-    public SuperStew[] stewPots = new SuperStew[1];
 
     {
         try {
@@ -135,11 +133,6 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
 
-        for (SuperStew superStew : stewPots) {
-            if (superStew != null) {
-                superStew.draw(g2, this);
-            }
-        }
 
         player.draw(g2);
 

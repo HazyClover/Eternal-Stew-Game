@@ -6,7 +6,6 @@ import main.GamePanel;
 
 import javax.imageio.ImageIO;
 import java.io.IOException;
-import java.util.Random;
 
 public class OBJ_berry_bush_blackberry extends SuperObject {
 
@@ -20,7 +19,6 @@ public class OBJ_berry_bush_blackberry extends SuperObject {
         type = "berry_bush_blackberry";
         value = 5;
         lastHarvested = gp.gameLifetime;
-        harvestRandomTime = new Random();
         nextHarvestableTime = 0;
 
         //Give Buffs

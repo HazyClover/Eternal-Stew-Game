@@ -2,12 +2,13 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import object.OBJ_berry_bush_blackberry;
+import object.SuperObject;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.HashMap;
 
 public class Player extends Entity{
 
@@ -19,11 +20,16 @@ public class Player extends Entity{
     public final int screenX;
     public final int screenY;
 
-    public HashMap<String, Integer> inventoryItemsRow1 = new HashMap<>();
-    public HashMap<String, Integer> inventoryItemsRow2 = new HashMap<>();
-    public HashMap<String, Integer> inventoryItemsRow3 = new HashMap<>();
-    public HashMap<String, Integer> inventoryItemsRow4 = new HashMap<>();
-    public HashMap<String, Integer> inventoryItemsRow5 = new HashMap<>();
+    public int inventorySize = 25;
+    public int inventoryHandsSize = 2;
+
+
+    public SuperObject[] inventory = new SuperObject[inventorySize];
+    public SuperObject[] inventoryHands = new SuperObject[inventoryHandsSize];
+
+
+    public boolean isHand1 = true;
+    public boolean isHand2 = false;
 
     public long secondsToSleep = 0;
     public boolean isSleeping = false;
@@ -125,15 +131,27 @@ public class Player extends Entity{
             } else {
                 getThreadSleep(0);
             }
+            if(keyH.isOnePressed) {
+                if(isHand2) {
+                    isHand2 = false;
+                    isHand1 = true;
+                } else {
+                    isHand1 = true;
+                }
+            } else if (keyH.isTwoPressed) {
+                if (isHand1) {
+                    isHand1 = false;
+                    isHand2 = true;
+                } else {
+                    isHand2 = true;
+                }
+            }
         }
 
         if(keyH.interactPressed){
             int objIndex = gp.collisionDet.checkObject(this, true);
             pickUpObject(objIndex);
-            int stewIndex = gp.collisionDet.checkStew(this, true);
-            if(stewIndex != 999) {
-                System.out.println("PLAYER :: update | Interacted with stew!");
-            }
+
             getThreadSleep(0.3);
         }
 
@@ -142,37 +160,40 @@ public class Player extends Entity{
             getThreadSleep(0.3);
         }
     }
-    public void harvested(int i) {
-        gp.obj[i].nextHarvestableTime= gp.gameLifetime;
-        //gp.obj[i].nextHarvestableTime = ((gp.gameLifetime + gp.obj[i].timeTillNextHarvest)+gp.obj[i].harvestRandomTime.nextInt(0, gp.obj[i].harvestableChangeDifference));
-        gp.obj[i].nextHarvestableTime = (gp.gameLifetime + 20);
-    }
 
-    public int isInventoryFull() {
-            if (inventoryItemsRow1.size() >= 5) {
-                if (inventoryItemsRow2.size() >= 5) {
-                    if (inventoryItemsRow3.size() >= 5) {
-                        if (inventoryItemsRow4.size() >= 5) {
-                            if (inventoryItemsRow5.size() >= 5) {
-                                System.out.println("PLAYER :: isInventoryFull | TRUE");
-                                return 0;
-                            } else {
-                                return 5;
-                            }
-                        } else {
-                            return 4;
-                        }
-                    } else {
-                        return 3;
-                    }
-                } else {
-                    return 2;
-                }
-            } else {
-                return 1;
+    public boolean isInventoryFull(boolean isHands) {
+        if(!isHands) {
+            if(inventory.length >= inventorySize) {
+                return true;
             }
-
+        } else {
+            if(inventoryHands.length >= inventoryHandsSize){
+                return true;
+            }
+        }
+        return false;
     }
+
+    public void addObject(int objIndex, int itemIndex) {
+        switch (gp.obj[objIndex].type) {
+            case "berry_bush_blackberry":
+                inventory[itemIndex] = new OBJ_berry_bush_blackberry(gp);
+                break;
+            case "berry_bush_blueberry":
+                inventory[itemIndex] = new OBJ_berry_bush_blackberry(gp);
+                break;
+            case "bowl_test":
+                inventory[itemIndex] = new OBJ_berry_bush_blackberry(gp);
+                break;
+            case "stew_test":
+                inventory[itemIndex] = new OBJ_berry_bush_blackberry(gp);
+                break;
+        }
+    }
+
+    //public void putItemIfAbsent(int objIndex, int itemIndex) {
+    //    addObject(objIndex, itemIndex);
+    //}
 
     public void pickUpObject(int i) {
         if(i != 999) {
@@ -182,23 +203,17 @@ public class Player extends Entity{
             switch (type) {
                 case "berry_bush_blackberry", "berry_bush_blueberry":
                     if(gp.obj[i].nextHarvestableTime <= gp.gameLifetime) {
-
-                        int inventoryFullIndex = isInventoryFull();
-                        if (inventoryFullIndex == 1) {
-                            inventoryItemsRow1.putIfAbsent(type, 0);
-                            for (String item : inventoryItemsRow1.keySet()) {
-                                if (item.equals(type)) {
-                                    int entryValue = inventoryItemsRow1.get(item);
-                                    harvested(i);
-                                    inventoryItemsRow1.replace(item, entryValue + gp.obj[i].value);
-
+                        if(isInventoryFull(false)) {
+                            for (int item = 0; item < inventory.length; item++) {
+                                if(inventory[item].type != null) {
+                                    addObject(i, item);
                                     int currentBuff = 0;
 
                                     System.out.println("PLAYER :: pickUpObject - Found  '" + type + "'! | adding '" + gp.obj[i].value + "' to key");
 
                                     if (gp.obj[i].buffsApplied != null) {
                                         while (currentBuff < gp.obj[i].buffsApplied.length) {
-                                            //gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
+                                            gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
                                             System.out.println("PLAYER :: pickupObject - Applied buff '" + gp.obj[i].buffsApplied[currentBuff].buffID + "' | Stats changed -> ");
                                             System.out.println("Variable Changed: '" + gp.obj[i].buffsApplied[currentBuff].valueToChange + "' | value changed by: '" + gp.obj[i].buffsApplied[currentBuff].howMuchToChange + "'.");
                                             currentBuff++;
@@ -206,119 +221,20 @@ public class Player extends Entity{
                                     } else {
                                         System.out.println("PLAYER :: pickupObject - '" + gp.obj[i].name + "' has no buff!");
                                     }
-
-                                }
-                            }
-                        } else if (inventoryFullIndex == 2) {
-                            inventoryItemsRow2.putIfAbsent(type, 0);
-                            for (String item : inventoryItemsRow2.keySet()) {
-                                if (item.equals(type)) {
-                                    int entryValue = inventoryItemsRow2.get(item);
-                                    harvested(i);
-                                    inventoryItemsRow2.replace(item, entryValue+gp.obj[i].value);
-
-                                    int currentBuff = 0;
-
-                                    System.out.println("PLAYER :: pickUpObject - Found  '" + type + "'! | adding '" + gp.obj[i].value + "' to key");
-
-                                    if(gp.obj[i].buffsApplied != null) {
-                                        while(currentBuff  < gp.obj[i].buffsApplied.length) {
-                                            //gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
-                                            System.out.println("PLAYER :: pickupObject - Applied buff '"+ gp.obj[i].buffsApplied[currentBuff].buffID+"' | Stats changed -> ");
-                                            System.out.println("Variable Changed: '"+ gp.obj[i].buffsApplied[currentBuff].valueToChange+"' | value changed by: '"+gp.obj[i].buffsApplied[currentBuff].howMuchToChange + "'.");
-                                            currentBuff++;
-                                        }
-                                    } else {
-                                        System.out.println("PLAYER :: pickupObject - '" + gp.obj[i].name + "' has no buff!");
-                                    }
-
-                                }
-                            }
-                        } else if (inventoryFullIndex == 3) {
-                            inventoryItemsRow3.putIfAbsent(type, 0);
-                            for (String item : inventoryItemsRow3.keySet()) {
-                                if (item.equals(type)) {
-                                    int entryValue = inventoryItemsRow3.get(item);
-                                    harvested(i);
-                                    inventoryItemsRow3.replace(item, entryValue+gp.obj[i].value);
-
-                                    int currentBuff = 0;
-
-                                    System.out.println("PLAYER :: pickUpObject - Found  '" + type + "'! | adding '" + gp.obj[i].value + "' to key");
-
-                                    if(gp.obj[i].buffsApplied != null) {
-                                        while(currentBuff  < gp.obj[i].buffsApplied.length) {
-                                            //gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
-                                            System.out.println("PLAYER :: pickupObject - Applied buff '"+ gp.obj[i].buffsApplied[currentBuff].buffID+"' | Stats changed -> ");
-                                            System.out.println("Variable Changed: '"+ gp.obj[i].buffsApplied[currentBuff].valueToChange+"' | value changed by: '"+gp.obj[i].buffsApplied[currentBuff].howMuchToChange + "'.");
-                                            currentBuff++;
-                                        }
-                                    } else {
-                                        System.out.println("PLAYER :: pickupObject - '" + gp.obj[i].name + "' has no buff!");
-                                    }
-
-                                }
-                            }
-                        } else if (inventoryFullIndex == 4) {
-                            inventoryItemsRow4.putIfAbsent(type, 0);
-                            for (String item : inventoryItemsRow4.keySet()) {
-                                if (item.equals(type)) {
-                                    int entryValue = inventoryItemsRow4.get(item);
-                                    harvested(i);
-                                    inventoryItemsRow4.replace(item, entryValue+gp.obj[i].value);
-
-                                    int currentBuff = 0;
-
-                                    System.out.println("PLAYER :: pickUpObject - Found  '" + type + "'! | adding '" + gp.obj[i].value + "' to key");
-
-                                    if(gp.obj[i].buffsApplied != null) {
-                                        while(currentBuff  < gp.obj[i].buffsApplied.length) {
-                                            //gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
-                                            System.out.println("PLAYER :: pickupObject - Applied buff '"+ gp.obj[i].buffsApplied[currentBuff].buffID+"' | Stats changed -> ");
-                                            System.out.println("Variable Changed: '"+ gp.obj[i].buffsApplied[currentBuff].valueToChange+"' | value changed by: '"+gp.obj[i].buffsApplied[currentBuff].howMuchToChange + "'.");
-                                            currentBuff++;
-                                        }
-                                    } else {
-                                        System.out.println("PLAYER :: pickupObject - '" + gp.obj[i].name + "' has no buff!");
-                                    }
-
-                                }
-                            }
-                        } else if (inventoryFullIndex == 5) {
-                            inventoryItemsRow5.putIfAbsent(type, 0);
-                            for (String item : inventoryItemsRow5.keySet()) {
-                                if (item.equals(type)) {
-                                    int entryValue = inventoryItemsRow5.get(item);
-                                    harvested(i);
-                                    inventoryItemsRow5.replace(item, entryValue+gp.obj[i].value);
-
-                                    int currentBuff = 0;
-
-                                    System.out.println("PLAYER :: pickUpObject - Found  '" + type + "'! | adding '" + gp.obj[i].value + "' to key");
-
-                                    if(gp.obj[i].buffsApplied != null) {
-                                        while(currentBuff  < gp.obj[i].buffsApplied.length) {
-                                            //gp.obj[i].buffsApplied[currentBuff].applyBuff(i, currentBuff, gp);
-                                            System.out.println("PLAYER :: pickupObject - Applied buff '"+ gp.obj[i].buffsApplied[currentBuff].buffID+"' | Stats changed -> ");
-                                            System.out.println("Variable Changed: '"+ gp.obj[i].buffsApplied[currentBuff].valueToChange+"' | value changed by: '"+gp.obj[i].buffsApplied[currentBuff].howMuchToChange + "'.");
-                                            currentBuff++;
-                                        }
-                                    } else {
-                                        System.out.println("PLAYER :: pickupObject - '" + gp.obj[i].name + "' has no buff!");
-                                    }
-
+                                } else {
+                                    addObject(i, item);
                                 }
                             }
                         }
+                    }
                     System.out.println("PLAYER :: pickUpObject - Berry bush is harvestable in  | '" + (gp.obj[i].nextHarvestableTime-gp.gameLifetime) + "' Seconds.");
                     break;
             }
             gp.ui.showMessage("Picked up: '" + gp.obj[i].name +"' X " + gp.obj[i].value);
-
-            }
-            getThreadSleep(0.1);
         }
+        getThreadSleep(0.1);
     }
+
 
     public void draw(Graphics2D g2){
 

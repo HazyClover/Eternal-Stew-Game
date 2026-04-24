@@ -94,33 +94,4 @@ public class CollisionDetector {
         }
         return index;
     }
-    public int checkStew(Entity entity, boolean player) {
-
-        int index = 999;
-        for(int i = 0; i < gp.stewPots.length; i++){
-            if(gp.stewPots[i] != null) {
-                // Get entities solid area position
-                entity.solidArea.x = entity.worldX + entity.solidArea.x;
-                entity.solidArea.y = entity.worldY + entity.solidArea.y;
-
-                // Objects solid area position
-                gp.stewPots[i].solidArea.x = gp.stewPots[i].worldX + gp.stewPots[i].solidArea.x;
-                gp.stewPots[i].solidArea.y = gp.stewPots[i].worldY + gp.stewPots[i].solidArea.y;
-
-                if (entity.solidArea.intersects(gp.stewPots[i].solidArea)) {
-                    if(gp.stewPots[i].collision) {
-                        entity.collisionOn = true;
-                    }
-                    if(player) {
-                        index = i;
-                    }
-                }
-                entity.solidArea.x = entity.solidAreaDefaultX;
-                entity.solidArea.y = entity.solidAreaDefaultY;
-                gp.stewPots[i].solidArea.x = gp.stewPots[i].solidAreaDefaultX;
-                gp.stewPots[i].solidArea.y = gp.stewPots[i].solidAreaDefaultY;
-            }
-        }
-        return index;
-    }
 }
